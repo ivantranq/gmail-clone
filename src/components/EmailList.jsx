@@ -13,24 +13,22 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import InboxIcon from "@mui/icons-material/Inbox";
 import PeopleIcon from "@mui/icons-material/People";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import { db } from "../firebase";
+import { db } from "../firebase.js";
 
 const EmailList = () => {
   const [emails, setEmails] = useState([]);
 
   useEffect(() => {
     db.collection("emails")
-      .orderBy("timestamp", "desc")
-      .onSnapshot((snapshot) =>
+      .orderBy("timeStamp", "desc")
+      .onSnapshot((querySnapshot) => {
         setEmails(
-          snapshot.docs.map((doc) => ({
+          querySnapshot.docs.map((doc) => ({
             id: doc.id,
             data: doc.data(),
           }))
-        )
-      );
-
-    console.log(emails);
+        );
+      });
   }, []);
 
   return (
@@ -69,22 +67,16 @@ const EmailList = () => {
         <Section Icon={LocalOfferIcon} title="Promotions" color="green" />
       </div>
       <div className="email-list__list">
-        {emails.map(({ id, data: { to, subject, message, timestamp } }) => {
+        {emails.map(({ id, data: { to, subject, message, timeStamp } }) => (
           <EmailRow
             id={id}
             key={id}
             title={to}
             subject={subject}
             description={message}
-            time={new Date(timestamp?.seconds * 1000).toUTCString()}
-          />;
-        })}
-        <EmailRow
-          title="Twitch"
-          subject="Hello fellow streamer"
-          message="This is a test"
-          time="10pm"
-        />
+            time={new Date(timeStamp?.seconds * 1000).toUTCString()}
+          />
+        ))}
       </div>
     </div>
   );
